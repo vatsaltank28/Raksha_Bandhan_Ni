@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Raksha Bandhan - Bond of Love & Memories</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP for 3D ChromaGrid Interactive Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -28,11 +30,11 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(-45deg, #fce7f3, #fbcfe8, #f472b6, #fb7185, #fda4af);
+            background: linear-gradient(-45deg, #1b0a1f, #2d0b28, #3b0d2d, #20081c, #160417);
             background-size: 400% 400%;
-            animation: animated-gradient 20s ease infinite;
+            animation: animated-gradient 22s ease infinite;
             overflow-x: hidden;
-            color: #1f2937;
+            color: #fce7f3;
         }
 
         .font-dancing {
@@ -44,11 +46,11 @@
         }
 
         .text-shadow {
-            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
         }
 
         .text-shadow-md {
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
         }
 
         /* -------------------------------------------
@@ -57,7 +59,7 @@
         .scroll-expand {
             position: relative;
             width: 100%;
-            background: #0f0a14;
+            background: #09030b;
         }
 
         .scroll-expand__track {
@@ -79,7 +81,7 @@
             inset: 0;
             clip-path: inset(20% 28% 20% 28% round 28px);
             will-change: clip-path;
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8);
         }
 
         .scroll-expand__media {
@@ -98,7 +100,7 @@
             position: absolute;
             inset: 0;
             pointer-events: none;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.6) 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.65) 100%);
             opacity: 0;
         }
 
@@ -152,39 +154,228 @@
             gap: 6px;
         }
 
-        /* Postcards and Album Cards */
+        /* Postcards 3D Hover */
         .card {
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 35px -10px rgba(225, 29, 72, 0.3);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 45px -10px rgba(244, 63, 94, 0.35);
         }
 
-        .album-card {
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+        /* -------------------------------------------
+           React Bits: ChromaGrid 3D Component Styles
+           ------------------------------------------- */
+        .chroma-container {
+            position: relative;
+            width: 100%;
+            min-height: 800px;
+            overflow: hidden;
+            border-radius: 32px;
+            padding: 1.5rem 0.5rem;
         }
 
-        .album-card:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 20px 30px -10px rgba(219, 39, 119, 0.35);
+        .chroma-grid {
+            position: relative;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 320px));
+            justify-content: center;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            box-sizing: border-box;
+
+            --x: 50%;
+            --y: 50%;
+            --r: 340px;
         }
 
-        .album-card .overlay {
+        @media (max-width: 768px) {
+            .chroma-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1rem;
+                padding: 0.75rem;
+            }
+        }
+
+        .chroma-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: var(--card-gradient);
+            box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+            transform-style: preserve-3d;
+            will-change: transform;
+
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            --spotlight-color: rgba(255, 255, 255, 0.35);
+            cursor: pointer;
+        }
+
+        .chroma-card:hover {
+            border-color: var(--card-border);
+            box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.8), 0 0 25px -5px var(--card-border);
+        }
+
+        .chroma-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%);
+            pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.5s ease;
+            z-index: 2;
         }
 
-        .album-card:hover .overlay {
+        .chroma-card:hover::before {
             opacity: 1;
+        }
+
+        .chroma-img-wrapper {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            padding: 12px;
+            box-sizing: border-box;
+            background: transparent;
+            height: 290px;
+        }
+
+        .chroma-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .chroma-card:hover .chroma-img-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .chroma-info {
+            position: relative;
+            z-index: 1;
+            padding: 1rem 1.25rem;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            background: rgba(10, 4, 15, 0.7);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .chroma-info .name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chroma-info .role {
+            font-size: 0.85rem;
+            color: #fda4af;
+            font-weight: 500;
+        }
+
+        .chroma-info .badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .chroma-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+            backdrop-filter: grayscale(0.85) brightness(0.8);
+            -webkit-backdrop-filter: grayscale(0.85) brightness(0.8);
+            background: rgba(0, 0, 0, 0.001);
+
+            mask-image: radial-gradient(
+                circle var(--r) at var(--x) var(--y),
+                transparent 0%,
+                transparent 20%,
+                rgba(0, 0, 0, 0.1) 35%,
+                rgba(0, 0, 0, 0.25) 50%,
+                rgba(0, 0, 0, 0.4) 65%,
+                rgba(0, 0, 0, 0.6) 80%,
+                rgba(0, 0, 0, 0.75) 90%,
+                white 100%
+            );
+            -webkit-mask-image: radial-gradient(
+                circle var(--r) at var(--x) var(--y),
+                transparent 0%,
+                transparent 20%,
+                rgba(0, 0, 0, 0.1) 35%,
+                rgba(0, 0, 0, 0.25) 50%,
+                rgba(0, 0, 0, 0.4) 65%,
+                rgba(0, 0, 0, 0.6) 80%,
+                rgba(0, 0, 0, 0.75) 90%,
+                white 100%
+            );
+        }
+
+        .chroma-fade {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+            backdrop-filter: grayscale(0.85) brightness(0.8);
+            -webkit-backdrop-filter: grayscale(0.85) brightness(0.8);
+            background: rgba(0, 0, 0, 0.001);
+
+            mask-image: radial-gradient(
+                circle var(--r) at var(--x) var(--y),
+                white 0%,
+                white 20%,
+                rgba(255, 255, 255, 0.9) 35%,
+                rgba(255, 255, 255, 0.75) 50%,
+                rgba(255, 255, 255, 0.6) 65%,
+                rgba(255, 255, 255, 0.4) 80%,
+                rgba(255, 255, 255, 0.25) 90%,
+                transparent 100%
+            );
+            -webkit-mask-image: radial-gradient(
+                circle var(--r) at var(--x) var(--y),
+                white 0%,
+                white 20%,
+                rgba(255, 255, 255, 0.9) 35%,
+                rgba(255, 255, 255, 0.75) 50%,
+                rgba(255, 255, 255, 0.6) 65%,
+                rgba(255, 255, 255, 0.4) 80%,
+                rgba(255, 255, 255, 0.25) 90%,
+                transparent 100%
+            );
+
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
 
         /* Modal Styles */
         .message-modal {
             background-color: #ffffff;
             border: 2px solid #fbcfe8;
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
 
@@ -202,14 +393,14 @@
             width: 10px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(253, 232, 241, 0.6);
+            background: rgba(20, 5, 25, 0.8);
         }
         ::-webkit-scrollbar-thumb {
-            background: #f472b6;
+            background: #f43f5e;
             border-radius: 5px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #ec4899;
+            background: #fb7185;
         }
     </style>
 </head>
@@ -217,7 +408,7 @@
 <body class="antialiased">
 
     <!-- ================================================================= -->
-    <!-- ScrollExpand Hero Section (Landing Page with Landing Page.jpeg)   -->
+    <!-- ScrollExpand Hero Section (Landing Page with Landing.jpeg)        -->
     <!-- ================================================================= -->
     <div id="hero-scroll-expand" class="scroll-expand">
         <div id="scroll-track" class="scroll-expand__track">
@@ -225,13 +416,13 @@
                 
                 <!-- The Animated Expanding Frame -->
                 <div id="scroll-frame" class="scroll-expand__frame">
-                    <img id="scroll-media" class="scroll-expand__media" src="Photos/Landing%20Page.jpeg" alt="Happy Raksha Bandhan Landing" draggable="false">
+                    <img id="scroll-media" class="scroll-expand__media" src="Photos/Landing.jpeg" alt="Happy Raksha Bandhan Landing" draggable="false">
                     <div id="scroll-scrim" class="scroll-expand__scrim"></div>
                     
                     <!-- Content that fades in once expanded -->
                     <div id="scroll-overlay" class="scroll-expand__overlay">
                         <div class="max-w-3xl mx-auto flex flex-col items-center">
-                            <span class="inline-block px-5 py-2 rounded-full bg-pink-500/80 backdrop-blur-md text-white text-sm md:text-base font-semibold tracking-wider uppercase mb-4 shadow-lg">
+                            <span class="inline-block px-5 py-2 rounded-full bg-pink-600/80 backdrop-blur-md text-white text-sm md:text-base font-semibold tracking-wider uppercase mb-4 shadow-lg border border-pink-400/30">
                                 🪢 Pyaar Ka Bandhan 🪢
                             </span>
                             <h2 class="text-4xl md:text-7xl font-bold text-white font-dancing mb-4 text-shadow">
@@ -241,7 +432,7 @@
                                 A sacred celebration of love, lifelong protection, unforgettable childhood memories, and endless laughter.
                             </p>
                             <a href="#wishes-section" class="bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 text-white font-bold py-3.5 px-8 rounded-full text-lg md:text-xl shadow-xl hover:scale-105 hover:shadow-pink-500/50 transform transition duration-300">
-                                ✨ Explore Postcards & Memories ✨
+                                ✨ Explore Postcards & 3D Album ✨
                             </a>
                         </div>
                     </div>
@@ -259,7 +450,7 @@
 
                 <!-- Scroll Hint Cue (Fades away as scroll starts) -->
                 <div id="scroll-hint" class="scroll-expand__hint">
-                    <span class="animate-bounce">↓</span>
+                    <span class="animate-bounce text-xl">↓</span>
                     <span>Scroll to Expand</span>
                 </div>
 
@@ -268,39 +459,39 @@
     </div>
 
     <!-- ================================================================= -->
-    <!-- Main Content: Wishes Postcards + Photo Album                     -->
+    <!-- Main Content: Wishes Postcards + 3D ChromaGrid Photo Album       -->
     <!-- ================================================================= -->
     <main class="min-h-screen w-full flex flex-col items-center p-4 md:p-8 max-w-7xl mx-auto">
         
         <!-- Section Header -->
-        <div id="wishes-section" class="text-center pt-16 pb-10">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-md border border-white/70 text-pink-900 text-sm font-semibold mb-3 shadow-sm">
+        <div id="wishes-section" class="text-center pt-20 pb-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/20 backdrop-blur-md border border-pink-500/40 text-pink-200 text-sm font-semibold mb-3 shadow-sm">
                 <span>💌</span> Three Special Postcards <span>💌</span>
             </div>
             <h2 class="text-5xl md:text-7xl font-bold text-white font-dancing text-shadow tracking-wide drop-shadow-md">
                 Special Rakhi Wishes
             </h2>
-            <p class="text-lg md:text-2xl text-white mt-2 text-shadow-md font-light">
+            <p class="text-lg md:text-2xl text-pink-200 mt-2 text-shadow-md font-light">
                 Click reveal on each card to read a message from the heart.
             </p>
         </div>
 
         <!-- 3 Featured Postcards (1.jpeg, 2.jpeg, 3.jpeg) -->
-        <section class="w-full max-w-6xl mb-16">
+        <section class="w-full max-w-6xl mb-20">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                 
                 <!-- Card 1 -->
-                <div id="card-1" class="card bg-white/95 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-white/70 flex flex-col h-full">
+                <div id="card-1" class="card bg-slate-900/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-pink-500/30 flex flex-col h-full">
                     <div class="relative overflow-hidden h-72 group">
                         <img src="Photos/1.jpeg"
                             alt="Raksha Bandhan Card 1"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute top-3 right-3 bg-pink-500/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                        <div class="absolute top-3 right-3 bg-pink-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                             Card #1
                         </div>
                     </div>
                     <div class="p-6 text-center flex flex-col justify-between flex-grow">
-                        <p class="text-gray-600 text-sm mb-4 font-medium italic">"From blurry childhood photos to today's selfies..."</p>
+                        <p class="text-pink-200/90 text-sm mb-4 font-medium italic">"From blurry childhood photos to today's selfies..."</p>
                         <button
                             class="reveal-btn w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-3 px-6 rounded-2xl hover:from-pink-600 hover:to-rose-600 shadow-md hover:shadow-pink-500/30 transition-all duration-300 active:scale-95"
                             data-message="Happy Raksha Bandhan! ❤️&#10;&#10;From blurry childhood photos to today's selfies, we've somehow managed to make every phase memorable. 😂 Thanks for all the laughs, chaos, and memories. Here's to creating even more stories we'll embarrass each other with later. Love you, sis! 🤍">
@@ -310,17 +501,17 @@
                 </div>
 
                 <!-- Card 2 -->
-                <div id="card-2" class="card bg-white/95 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-white/70 flex flex-col h-full">
+                <div id="card-2" class="card bg-slate-900/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-purple-500/30 flex flex-col h-full">
                     <div class="relative overflow-hidden h-72 group">
                         <img src="Photos/2.jpeg"
                             alt="Raksha Bandhan Card 2"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute top-3 right-3 bg-purple-500/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                        <div class="absolute top-3 right-3 bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                             Card #2
                         </div>
                     </div>
                     <div class="p-6 text-center flex flex-col justify-between flex-grow">
-                        <p class="text-gray-600 text-sm mb-4 font-medium italic">"Congratulations on surviving me as your brother all these years..."</p>
+                        <p class="text-purple-200/90 text-sm mb-4 font-medium italic">"Congratulations on surviving me as your brother all these years..."</p>
                         <button
                             class="reveal-btn w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-3 px-6 rounded-2xl hover:from-purple-600 hover:to-indigo-600 shadow-md hover:shadow-purple-500/30 transition-all duration-300 active:scale-95"
                             data-message="Congratulations on surviving me as your brother all these years. 😌 I know it's not easy. Thanks for being my unpaid therapist, personal roast partner, and lifelong best friend. Wishing you unlimited happiness (and patience to deal with me). 😂❤️">
@@ -330,17 +521,17 @@
                 </div>
 
                 <!-- Card 3 -->
-                <div id="card-3" class="card bg-white/95 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-white/70 flex flex-col h-full">
+                <div id="card-3" class="card bg-slate-900/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-amber-500/30 flex flex-col h-full">
                     <div class="relative overflow-hidden h-72 group">
                         <img src="Photos/3.jpeg"
                             alt="Raksha Bandhan Card 3"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="absolute top-3 right-3 bg-amber-500/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                        <div class="absolute top-3 right-3 bg-amber-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                             Card #3
                         </div>
                     </div>
                     <div class="p-6 text-center flex flex-col justify-between flex-grow">
-                        <p class="text-gray-600 text-sm mb-4 font-medium italic">"Partners in crime since day one, professional troublemakers..."</p>
+                        <p class="text-amber-200/90 text-sm mb-4 font-medium italic">"Partners in crime since day one, professional troublemakers..."</p>
                         <button
                             class="reveal-btn w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-3 px-6 rounded-2xl hover:from-amber-600 hover:to-orange-600 shadow-md hover:shadow-orange-500/30 transition-all duration-300 active:scale-95"
                             data-message="Partners in crime since day one, professional troublemakers ever since. 😎 Thanks for every prank, every fight that lasted five minutes, and every memory we've made together. May we never stop annoying each other. Love you, sis! 💖">
@@ -354,34 +545,40 @@
 
         <!-- Decorative Divider -->
         <div class="w-full flex items-center justify-center my-6">
-            <div class="h-px bg-white/40 flex-grow max-w-xs"></div>
-            <div class="mx-4 text-white text-2xl animate-pulse">🌸 ✨ 🌸</div>
-            <div class="h-px bg-white/40 flex-grow max-w-xs"></div>
+            <div class="h-px bg-pink-500/30 flex-grow max-w-xs"></div>
+            <div class="mx-4 text-pink-300 text-2xl animate-pulse">🌸 ✨ 🌸</div>
+            <div class="h-px bg-pink-500/30 flex-grow max-w-xs"></div>
         </div>
 
-        <!-- Photo Album Section Below Wishes (Without Landing Page & 1, 2, 3) -->
-        <section id="photo-album" class="w-full mt-8 mb-16">
+        <!-- ============================================================= -->
+        <!-- React Bits: 3D ChromaGrid Photo Album                         -->
+        <!-- ============================================================= -->
+        <section id="photo-album" class="w-full mt-10 mb-20">
             <!-- Album Section Header -->
             <div class="text-center mb-10">
-                <span class="inline-block bg-white/40 backdrop-blur-md border border-white/60 text-pink-950 font-semibold px-4 py-1.5 rounded-full text-sm mb-3">
-                    📸 20 Cherished Memories
+                <span class="inline-block bg-pink-500/20 backdrop-blur-md border border-pink-400/40 text-pink-200 font-semibold px-5 py-2 rounded-full text-sm mb-3">
+                    ✨ 3D Interactive Spotlight Gallery • 22 Memories
                 </span>
                 <h2 class="text-4xl md:text-6xl font-bold text-white font-dancing text-shadow">
-                    Hamari Yaadein - Photo Album
+                    Hamari Yaadein - Chroma Photo Album
                 </h2>
-                <p class="text-white text-base md:text-lg mt-2 text-shadow-md font-light max-w-2xl mx-auto">
-                    A gallery of smiles, adventures, and sweetest moments together. Click any photo to view in full size!
+                <p class="text-pink-200/90 text-base md:text-lg mt-2 text-shadow-md font-light max-w-2xl mx-auto">
+                    Move your cursor to experience the chromatic spotlight and 3D card tilt. Click any memory to open high-res full screen!
                 </p>
             </div>
 
-            <!-- Photos Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6" id="album-grid">
-                <!-- Album photos inserted via JavaScript -->
+            <!-- ChromaGrid Component Container -->
+            <div class="chroma-container">
+                <div id="chroma-root" class="chroma-grid">
+                    <!-- Cards dynamically injected via JavaScript -->
+                    <div class="chroma-overlay"></div>
+                    <div id="chroma-fade" class="chroma-fade"></div>
+                </div>
             </div>
         </section>
 
         <!-- Footer -->
-        <footer class="w-full text-center py-8 border-t border-white/30 text-white font-medium text-sm md:text-base">
+        <footer class="w-full text-center py-8 border-t border-pink-500/20 text-pink-300/80 font-medium text-sm md:text-base">
             <p class="text-shadow-md">Crafted with ❤️ for Raksha Bandhan • Forever & Always</p>
         </footer>
 
@@ -389,7 +586,7 @@
 
     <!-- Message Modal (For Landing Postcards) -->
     <div id="message-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="modal-backdrop"></div>
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" id="modal-backdrop"></div>
         <div
             class="message-modal rounded-3xl w-full max-w-lg mx-auto p-6 md:p-8 text-center relative transform scale-95 transition-all duration-300">
             <canvas id="modal-canvas"></canvas>
@@ -423,17 +620,17 @@
 
         <!-- Counter Indicator -->
         <div id="lightbox-counter" class="absolute top-4 left-4 text-white/90 bg-white/15 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-semibold tracking-wider z-50">
-            1 / 20
+            1 / 22
         </div>
 
         <!-- Navigation Buttons -->
-        <button id="lightbox-prev" class="absolute left-2 md:left-6 text-white/90 hover:text-white bg-black/40 hover:bg-black/70 p-3 rounded-full z-50 transition transform hover:scale-110 active:scale-95">
+        <button id="lightbox-prev" class="absolute left-2 md:left-6 text-white/90 hover:text-white bg-black/50 hover:bg-black/80 p-3.5 rounded-full z-50 transition transform hover:scale-110 active:scale-95 border border-white/20">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
             </svg>
         </button>
 
-        <button id="lightbox-next" class="absolute right-2 md:right-6 text-white/90 hover:text-white bg-black/40 hover:bg-black/70 p-3 rounded-full z-50 transition transform hover:scale-110 active:scale-95">
+        <button id="lightbox-next" class="absolute right-2 md:right-6 text-white/90 hover:text-white bg-black/50 hover:bg-black/80 p-3.5 rounded-full z-50 transition transform hover:scale-110 active:scale-95 border border-white/20">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
             </svg>
@@ -465,9 +662,9 @@
             const overlay = document.getElementById('scroll-overlay');
 
             const config = {
-                startWidth: 44,      // % of stage width
-                startHeight: 58,     // % of stage height
-                startRadius: 28,     // px
+                startWidth: 44,
+                startHeight: 58,
+                startRadius: 28,
                 endRadius: 0,
                 mediaZoom: 1.35,
                 scrollDistance: 1.2,
@@ -589,54 +786,151 @@
             window.addEventListener('resize', onResize);
 
             // -------------------------------------------------------------
-            // 2. Photo Album Rendering (20 photos, excluding Landing Page & 1,2,3)
+            // 2. React Bits: 3D ChromaGrid Component Integration
             // -------------------------------------------------------------
-            const albumPhotos = [
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.14 (1).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.14 (2).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.14.jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.15 (1).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.15 (2).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.15 (3).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.15.jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.16 (1).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.16 (3).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.17 (1).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.17 (2).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.17.jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.18 (2).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.18.jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.19 (1).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.19 (2).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.19 (3).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.19.jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.20 (1).jpeg",
-                "Photos/WhatsApp Image 2026-08-27 at 19.09.20 (2).jpeg"
+            const photoMetadata = [
+                { title: "Sweetest Smiles", subtitle: "Cherished Times", border: "#F43F5E", gradient: "linear-gradient(145deg, #f43f5e 0%, #170714 85%)" },
+                { title: "Partners In Crime", subtitle: "Masti & Laughter", border: "#A855F7", gradient: "linear-gradient(160deg, #a855f7 0%, #130720 85%)" },
+                { title: "Sacred Bond", subtitle: "Pyaar Ka Bandhan", border: "#F59E0B", gradient: "linear-gradient(145deg, #f59e0b 0%, #1e1305 85%)" },
+                { title: "Childhood Vibes", subtitle: "Endless Memories", border: "#06B6D4", gradient: "linear-gradient(170deg, #06b6d4 0%, #061922 85%)" },
+                { title: "Forever Best Friends", subtitle: "Always Together", border: "#10B981", gradient: "linear-gradient(150deg, #10b981 0%, #061e14 85%)" },
+                { title: "Candid Joy", subtitle: "Unfiltered Love", border: "#EC4899", gradient: "linear-gradient(145deg, #ec4899 0%, #200615 85%)" },
+                { title: "Pure Nostalgia", subtitle: "Golden Days", border: "#8B5CF6", gradient: "linear-gradient(165deg, #8b5cf6 0%, #120724 85%)" },
+                { title: "Sister & Brother", subtitle: "Unbreakable Connection", border: "#E11D48", gradient: "linear-gradient(140deg, #e11d48 0%, #1b050d 85%)" },
+                { title: "Heartfelt Moments", subtitle: "Treasured Smiles", border: "#F97316", gradient: "linear-gradient(155deg, #f97316 0%, #1f0c05 85%)" },
+                { title: "Laughing Out Loud", subtitle: "Nonstop Drama", border: "#14B8A6", gradient: "linear-gradient(145deg, #14b8a6 0%, #051d18 85%)" },
+                { title: "Rakhi Special", subtitle: "Threads of Affection", border: "#D946EF", gradient: "linear-gradient(150deg, #d946ef 0%, #1c0520 85%)" },
+                { title: "Golden Hours", subtitle: "Warm Memories", border: "#EAB308", gradient: "linear-gradient(140deg, #eab308 0%, #1d1704 85%)" },
+                { title: "Lifelong Companions", subtitle: "Growing Together", border: "#6366F1", gradient: "linear-gradient(160deg, #6366f1 0%, #0d0d26 85%)" },
+                { title: "Festival Cheers", subtitle: "Happiness Everywhere", border: "#FB7185", gradient: "linear-gradient(145deg, #fb7185 0%, #22060e 85%)" },
+                { title: "Precious Stories", subtitle: "Timeless Bonds", border: "#38BDF8", gradient: "linear-gradient(150deg, #38bdf8 0%, #061a25 85%)" },
+                { title: "Unpaid Therapist", subtitle: "Roast Partner", border: "#C084FC", gradient: "linear-gradient(140deg, #c084fc 0%, #190a28 85%)" },
+                { title: "Memorable Days", subtitle: "Forever In Heart", border: "#34D399", gradient: "linear-gradient(165deg, #34d399 0%, #071f16 85%)" },
+                { title: "Smile Always", subtitle: "Joyful Journey", border: "#F472B6", gradient: "linear-gradient(145deg, #f472b6 0%, #210816 85%)" },
+                { title: "Celebration Mood", subtitle: "Raksha Bandhan Vibes", border: "#FBBF24", gradient: "linear-gradient(150deg, #fbbf24 0%, #1f1806 85%)" },
+                { title: "Atoot Bandhan", subtitle: "Bond For Eternity", border: "#818CF8", gradient: "linear-gradient(160deg, #818cf8 0%, #10102b 85%)" },
+                { title: "Unforgettable Flashback", subtitle: "Childhood Magic", border: "#F43F5E", gradient: "linear-gradient(145deg, #f43f5e 0%, #19050d 85%)" },
+                { title: "Eternal Love", subtitle: "Sister & Brother Forever", border: "#A855F7", gradient: "linear-gradient(155deg, #a855f7 0%, #150622 85%)" }
             ];
 
-            const albumGrid = document.getElementById('album-grid');
+            const albumPhotos = [
+                "Photos/WhatsApp Image 2026-08-27 at 19.09.14 (1).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.09.15 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.09.15 (3).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.09.18 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.09.19 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.09.19.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.31.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.32 (1).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.32 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.32.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.33 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.33.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.34 (1).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.34 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.34.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.35 (1).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.35 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.35.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.36 (1).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.36 (2).jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.36.jpeg",
+                "Photos/WhatsApp Image 2026-08-27 at 19.45.37.jpeg"
+            ];
+
+            const chromaRoot = document.getElementById('chroma-root');
+            const chromaFade = document.getElementById('chroma-fade');
+            const chromaOverlay = document.querySelector('.chroma-overlay');
+
+            // Render ChromaGrid Cards
             albumPhotos.forEach((photoSrc, index) => {
+                const meta = photoMetadata[index] || {
+                    title: `Memory #${index + 1}`,
+                    subtitle: "Sweet Moment",
+                    border: "#F43F5E",
+                    gradient: "linear-gradient(145deg, #f43f5e 0%, #170714 85%)"
+                };
+
                 const safeSrc = encodeURI(photoSrc);
-                const card = document.createElement('div');
-                card.className = 'album-card relative rounded-2xl overflow-hidden shadow-lg bg-white/90 backdrop-blur-sm border-2 border-white/80 cursor-pointer group aspect-square';
-                card.setAttribute('data-index', index);
-                
-                card.innerHTML = `
-                    <img src="${safeSrc}" alt="Memory ${index + 1}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    <div class="overlay absolute inset-0 bg-gradient-to-t from-pink-950/85 via-black/25 to-transparent flex flex-col justify-end p-3 text-white">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-md">Memory #${index + 1}</span>
-                            <span class="text-base">🔍</span>
-                        </div>
+                const article = document.createElement('article');
+                article.className = 'chroma-card';
+                article.style.setProperty('--card-border', meta.border);
+                article.style.setProperty('--card-gradient', meta.gradient);
+                article.setAttribute('data-index', index);
+
+                article.innerHTML = `
+                    <div class="chroma-img-wrapper">
+                        <img src="${safeSrc}" alt="${meta.title}" loading="lazy">
                     </div>
+                    <footer class="chroma-info">
+                        <h3 class="name">
+                            <span>${meta.title}</span>
+                            <span class="badge">#${index + 1}</span>
+                        </h3>
+                        <p class="role">${meta.subtitle}</p>
+                    </footer>
                 `;
 
-                card.addEventListener('click', () => {
+                // 3D Card Interactive Tilt & Spotlight Coordinates
+                article.addEventListener('mousemove', (e) => {
+                    const rect = article.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    article.style.setProperty('--mouse-x', `${x}px`);
+                    article.style.setProperty('--mouse-y', `${y}px`);
+
+                    // 3D perspective tilt calculation
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -10;
+                    const rotateY = ((x - centerX) / centerX) * 10;
+                    article.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+                });
+
+                article.addEventListener('mouseleave', () => {
+                    article.style.transform = `perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)`;
+                });
+
+                article.addEventListener('click', () => {
                     openLightbox(index);
                 });
 
-                albumGrid.appendChild(card);
+                // Insert before overlays
+                chromaRoot.insertBefore(article, chromaOverlay);
             });
+
+            // GSAP Spotlight Cursor Tracker for ChromaGrid
+            if (typeof gsap !== 'undefined') {
+                const setX = gsap.quickSetter(chromaRoot, '--x', 'px');
+                const setY = gsap.quickSetter(chromaRoot, '--y', 'px');
+                const pos = { x: chromaRoot.offsetWidth / 2, y: chromaRoot.offsetHeight / 2 };
+                setX(pos.x);
+                setY(pos.y);
+
+                const moveTo = (x, y) => {
+                    gsap.to(pos, {
+                        x,
+                        y,
+                        duration: 0.45,
+                        ease: 'power3.out',
+                        onUpdate: () => {
+                            setX(pos.x);
+                            setY(pos.y);
+                        },
+                        overwrite: true
+                    });
+                };
+
+                chromaRoot.addEventListener('pointermove', (e) => {
+                    const r = chromaRoot.getBoundingClientRect();
+                    moveTo(e.clientX - r.left, e.clientY - r.top);
+                    gsap.to(chromaFade, { opacity: 0, duration: 0.25, overwrite: true });
+                });
+
+                chromaRoot.addEventListener('pointerleave', () => {
+                    gsap.to(chromaFade, { opacity: 1, duration: 0.6, overwrite: true });
+                });
+            }
 
             // -------------------------------------------------------------
             // 3. Lightbox Engine
